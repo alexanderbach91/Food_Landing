@@ -133,14 +133,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        function closeModalHelp(modalWindow) {
+            modalWindow.classList.remove('show');
+            modalWindow.classList.add('hide');
+            document.body.style.overflow = '';
+        }
+
 
     }
+    
 
-    function closeModalHelp(modal) {
-        modal.classList.remove('show');
-        modal.classList.add('hide');
-        document.body.style.overflow = '';
-    }
+   
 
     showModal(btnsOpenModal, modal);
     closeModal(modalClose, modal);
