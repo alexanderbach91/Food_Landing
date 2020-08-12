@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //Работа с таймером
 
     const deadline = '2020-08-12';
+    //const deadline = '2020-08-14';
 
     function getTimeLeft(endtime) {
         const t = Date.parse(endtime) - Date.parse(new Date()), //получаем разницу с дедлайном в мс
@@ -68,23 +69,32 @@ document.addEventListener('DOMContentLoaded', () => {
             minutes = timer.querySelector('#minutes'),
             seconds = timer.querySelector('#seconds'),
             //вызываем функцию каждую секунду для обновления счетчика
-            timeInterval = setInterval(updateClock, 1000); 
-        
-            updateClock(); //Вызываем один раз чтобы верстка не моргала
+            timeInterval = setInterval(updateClock, 1000);
+
+        updateClock(); //Вызываем один раз чтобы верстка не моргала
 
         function updateClock() {
             const t = getTimeLeft(endtime); //получаем оставшееся время 
             //и добавляем внутрь html элементов
 
-            days.innerHTML = addZero(t.days);
-            hours.innerHTML = addZero(t.hours);
-            minutes.innerHTML = addZero(t.minutes);
-            seconds.innerHTML = addZero(t.seconds);
-            
             //счетчик закончился, то перестаем вызывать функцию
             if (t.total <= 0) {
+                days.innerHTML = '0';
+                hours.innerHTML = '0';
+                minutes.innerHTML = '0';
+                seconds.innerHTML = '0';
                 clearInterval(timeInterval);
+
+            } else {
+                days.innerHTML = addZero(t.days);
+                hours.innerHTML = addZero(t.hours);
+                minutes.innerHTML = addZero(t.minutes);
+                seconds.innerHTML = addZero(t.seconds);
             }
+
+
+
+
         }
     }
     //добавляем нули к датам меньше 10, ex. 03:09:25
@@ -101,10 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Модальное окно
 
     const btnsOpenModal = document.querySelectorAll('button[data-modal]'),
-          modal = document.querySelector('.modal'),
-          modalClose = document.querySelector('div[data-close]');
-    
-          //Показать модальное окно при клике
+        modal = document.querySelector('.modal'),
+        modalClose = document.querySelector('div[data-close]');
+
+    //Показать модальное окно при клике
     function showModal(buttons, modalWindow) {
         buttons.forEach(item => {
             item.addEventListener('click', (event) => {
@@ -116,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     // закрыть модальное окно на крестик
-    function closeModal(closeButton , modalWindow) {
+    function closeModal(closeButton, modalWindow) {
         closeButton.addEventListener('click', () => {
             closeModalHelp(modalWindow);
         });
@@ -141,14 +151,104 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     }
-    
-
-   
 
     showModal(btnsOpenModal, modal);
     closeModal(modalClose, modal);
 
-    
+    //генерация меню
+
+    class MenuItem {
+        constructor(image, alt, header, description, price, parentSelector) {
+            this.image = image;
+            this.alt = alt;
+            this.header = header;
+            this.description = description;
+            this.price = price;
+            this.parent = document.querySelector(parentSelector);
+            this.convertPrice = 70;
+        }
+
+        convertToRub() {
+            return +this.price * this.convertPrice;
+        }
+        //метод с возвращением элемента без отрисовки
+        // createItem() {
+        //     const div = document.createElement('div');
+        //     div.innerHTML = `<div class="menu__item">
+        //         <img src=${this.image} alt=${this.alt}>
+        //         <h3 class="menu__item-subtitle">${this.header}</h3>
+        //         <div class="menu__item-descr">>${this.description}</div>
+        //         <div class="menu__item-divider"></div>
+        //         <div class="menu__item-price">
+        //             <div class="menu__item-cost">Цена:</div>
+        //             <div class="menu__item-total"><span>${this.convertToRub()}</span> грн/день</div>
+        //         </div>
+        //     </div>`;
+        //     return div;
+        // }
+
+        //создание элемента и отрисовка на страницу
+        render() {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                       <img src=${this.image} alt=${this.alt}>
+                       <h3 class="menu__item-subtitle">${this.header}</h3>
+                       <div class="menu__item-descr">${this.description}</div>
+                       <div class="menu__item-divider"></div>
+                       <div class="menu__item-price">
+                           <div class="menu__item-cost">Цена:</div>
+                           <div class="menu__item-total"><span>${this.convertToRub()}</span> руб/день</div>
+                       </div>`;
+            div.classList.add('menu__item');
+            this.parent.append(div);
+        }
+    }
+
+    // const menuContainer = document.querySelector('[data-menu]');
+    // const menu1Obj = new MenuItem("img/tabs/vegy.jpg", `Меню "Фитнес"`, `Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!`, 229);
+    // const menu1 = menu1Obj.createItem();
+    // const menu2Obj = new MenuItem("img/tabs/elite.jpg", `Меню “Премиум”`, `В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!`,550);
+    // const menu2 = menu2Obj.createItem();
+    // const menu3Obj = new MenuItem("img/tabs/post.jpg", `Меню "Постное"`,`Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`,430);
+    // const menu3 = menu3Obj.createItem();
+
+    // function appendMenu(container, menuItem) {
+    //     //  container.innerHTML += menuItem;
+    //     container.append(menuItem);
+    //  }
+
+    //  appendMenu(menuContainer, menu1);
+    //  appendMenu(menuContainer, menu2);
+    //  appendMenu(menuContainer, menu3);
+    new MenuItem(
+        "img/tabs/vegy.jpg",
+        "vegy",
+        `Меню "Фитнес"`,
+        `Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!`,
+        29,
+        '.menu .container'
+    ).render();
+    new MenuItem(
+        "img/tabs/elite.jpg",
+        "elite",
+        `Меню “Премиум”`,
+        `В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!`,
+        50,
+        '.menu .container'
+    ).render();
+    new MenuItem(
+        "img/tabs/post.jpg",
+        "post",
+        `Меню "Постное"`,
+        `Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`,
+        30,
+        '.menu .container'
+    ).render();
+
+
+
+
+
 
 
 });
