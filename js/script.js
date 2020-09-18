@@ -43,8 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //Работа с таймером
 
-    const deadline = '2020-08-12';
-    //const deadline = '2020-08-14';
+    const deadline = '2020-09-12';
+    //const deadline = '2020-09-14';
 
     function getTimeLeft(endtime) {
         const t = Date.parse(endtime) - Date.parse(new Date()), //получаем разницу с дедлайном в мс
@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnsOpenModal = document.querySelectorAll('button[data-modal]'),
         modal = document.querySelector('.modal'),
         modalClose = document.querySelector('div[data-close]');
+        
 
     //Показать модальное окно при клике
     function showModal(buttons, modalWindow) {
@@ -121,7 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 //modal.style.display = "block";
                 modalWindow.classList.remove('hide');
                 modalWindow.classList.add('show');
-                document.body.style.overflow = 'hidden'; //убираем прокрутку сайта 
+                document.body.style.overflow = 'hidden'; /* //убираем прокрутку сайта  */
+                clearInterval(modalTimerId); //очищаем интервал если открыли модальное окно в ручную
             });
         });
     }
@@ -155,16 +157,39 @@ document.addEventListener('DOMContentLoaded', () => {
     showModal(btnsOpenModal, modal);
     closeModal(modalClose, modal);
 
+    //Всплытие окна через 3 секунды + при прокруте до низу страницы
+
+    function openModal(modalWindow) {
+                modalWindow.classList.remove('hide');
+                modalWindow.classList.add('show');
+                document.body.style.overflow = 'hidden';
+    }
+
+    const modalTimerId = setTimeout(() => {
+        openModal(modal);
+    }, 5000);
+
+    function showModalByScroll() {
+        if (window.pageYOffset + document.documentElement.clientHeight 
+            >= document.documentElement.scrollHeight) {
+                openModal(modal);
+                window.removeEventListener('scroll', showModalByScroll);
+            }
+    }
+
+    window.addEventListener('scroll', showModalByScroll);
+
     //генерация меню
 
     class MenuItem {
-        constructor(image, alt, header, description, price, parentSelector) {
+        constructor(image, alt, header, description, price, parentSelector, ...classes) {
             this.image = image;
             this.alt = alt;
             this.header = header;
             this.description = description;
             this.price = price;
             this.parent = document.querySelector(parentSelector);
+            this.classes = classes;
             this.convertPrice = 70;
         }
 
@@ -199,7 +224,12 @@ document.addEventListener('DOMContentLoaded', () => {
                            <div class="menu__item-cost">Цена:</div>
                            <div class="menu__item-total"><span>${this.convertToRub()}</span> руб/день</div>
                        </div>`;
-            div.classList.add('menu__item');
+            //добавляем классы новосозданному элемент
+            if (this.classes.length === 0) {
+                this.classes = "menu__item";
+            } else {
+                this.classes.forEach(classItem => div.classList.add(classItem));
+            }
             this.parent.append(div);
         }
     }
@@ -220,13 +250,16 @@ document.addEventListener('DOMContentLoaded', () => {
     //  appendMenu(menuContainer, menu1);
     //  appendMenu(menuContainer, menu2);
     //  appendMenu(menuContainer, menu3);
+
+    //Создаем новые элементы и сразу их отрисовываем на страницу
     new MenuItem(
         "img/tabs/vegy.jpg",
         "vegy",
         `Меню "Фитнес"`,
         `Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!`,
         29,
-        '.menu .container'
+        '.menu .container',
+        'menu__item'
     ).render();
     new MenuItem(
         "img/tabs/elite.jpg",
@@ -234,7 +267,8 @@ document.addEventListener('DOMContentLoaded', () => {
         `Меню “Премиум”`,
         `В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!`,
         50,
-        '.menu .container'
+        '.menu .container',
+        'menu__item'
     ).render();
     new MenuItem(
         "img/tabs/post.jpg",
@@ -242,8 +276,11 @@ document.addEventListener('DOMContentLoaded', () => {
         `Меню "Постное"`,
         `Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`,
         30,
-        '.menu .container'
+        '.menu .container',
+        'menu__item'
     ).render();
+
+
 
 
 
