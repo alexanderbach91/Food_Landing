@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         buttons.forEach(item => {
             item.addEventListener('click', (event) => {
                 //modal.style.display = "block";
-                openModal(modalWindow)
+                openModal(modalWindow);
                 clearInterval(modalTimerId); //очищаем интервал если открыли модальное окно в ручную
             });
         });
@@ -278,6 +278,75 @@ document.addEventListener('DOMContentLoaded', () => {
         '.menu .container',
         'menu__item'
     ).render();
+
+
+    // Forms POST
+
+    const forms = document.querySelectorAll('form');
+
+    const message = {
+        loading: 'Загрузка',
+        success: 'Спасибо! Скоро мы с вами свяжемся',
+        failure: 'Что-то пошло не так...'
+    };
+
+    forms.forEach(form => {
+        postData(form);
+    });
+
+    function postData(form) {
+        form.addEventListener('submit', (event)=> {
+            event.preventDefault();
+
+            let statusMessage = document.createElement('div');
+            statusMessage.classList.add('status');
+            statusMessage.textContent = message.loading;
+            form.appendChild(statusMessage);
+
+
+            const request = new XMLHttpRequest();
+            request.open('POST', 'server.php');
+            //Когда используем связку  XMLHttpRequest и FormData то 
+            //заголовок устанавливать не нужно
+            // request.setRequestHeader('Content-type', 'multipart/form-data');
+            request.setRequestHeader('Content-type', 'application/json');
+            //отправка formData
+            const formData = new FormData(form);
+            //для json
+            const object = {};
+
+            formData.forEach( (value, key) => {
+                object[key] = value;
+            });
+
+            const json = JSON.stringify(object);
+
+            //отправляем форму
+            //request.send(formData);
+            request.send(json);
+
+            request.addEventListener('load', () => {
+                if (request.status === 200) {
+                    console.log(request.response);
+                    statusMessage.textContent = message.success;
+                    clearForm();
+                } else {
+                    statusMessage.textContent = message.failure;
+                    clearForm();
+                }
+            });
+
+            function clearForm() {
+                form.reset();
+                
+                setTimeout(()=>{
+                        statusMessage.remove();
+                    }, 3000);
+            }
+
+
+        });
+    }
 
 
 
