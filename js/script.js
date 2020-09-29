@@ -238,6 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
             //добавляем классы новосозданному элемент
             if (this.classes.length === 0) {
                 this.classes = "menu__item";
+                div.classList.add(this.classes);
+
             } else {
                 this.classes.forEach(classItem => div.classList.add(classItem));
             }
@@ -245,51 +247,75 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // const menuContainer = document.querySelector('[data-menu]');
-    // const menu1Obj = new MenuItem("img/tabs/vegy.jpg", `Меню "Фитнес"`, `Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!`, 229);
-    // const menu1 = menu1Obj.createItem();
-    // const menu2Obj = new MenuItem("img/tabs/elite.jpg", `Меню “Премиум”`, `В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!`,550);
-    // const menu2 = menu2Obj.createItem();
-    // const menu3Obj = new MenuItem("img/tabs/post.jpg", `Меню "Постное"`,`Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`,430);
-    // const menu3 = menu3Obj.createItem();
-
-    // function appendMenu(container, menuItem) {
-    //     //  container.innerHTML += menuItem;
-    //     container.append(menuItem);
-    //  }
-
-    //  appendMenu(menuContainer, menu1);
-    //  appendMenu(menuContainer, menu2);
-    //  appendMenu(menuContainer, menu3);
-
     //Создаем новые элементы и сразу их отрисовываем на страницу
-    new MenuItem(
-        "img/tabs/vegy.jpg",
-        "vegy",
-        `Меню "Фитнес"`,
-        `Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!`,
-        29,
-        '.menu .container',
-        'menu__item'
-    ).render();
-    new MenuItem(
-        "img/tabs/elite.jpg",
-        "elite",
-        `Меню “Премиум”`,
-        `В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!`,
-        50,
-        '.menu .container',
-        'menu__item'
-    ).render();
-    new MenuItem(
-        "img/tabs/post.jpg",
-        "post",
-        `Меню "Постное"`,
-        `Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`,
-        30,
-        '.menu .container',
-        'menu__item'
-    ).render();
+    const getItemData = async (url) => {
+        const result = await fetch(url);
+        
+        if (!result.ok) {
+            throw new Error(`Could not get data from ${url} , status: ${result.status}`);
+        }
+
+        return await result.json();
+    };
+
+    getItemData('http://localhost:3000/menu')
+        .then(data => {
+            data.forEach(({img, altimg, title, descr, price}) => {
+                new MenuItem(img, altimg, title, descr, price, '.menu .container').render();
+            });
+        });
+    
+    // //Второй способ без шаблонизации
+    // getItemData('http://localhost:3000/menu')
+    //     .then(data => createCard(data));
+
+    // function createCard(data) {
+    //     data.forEach(({img, altimg, title, descr, price}) => {
+    //         const elem = document.createElement('div');
+
+    //         elem.classList.add('menu__item');
+
+    //         elem.innerHTML = `
+    //             <img src=${img} alt=${altimg}>
+    //             <h3 class="menu__item-subtitle">${title}</h3>
+    //             <div class="menu__item-descr">${descr}</div>
+    //             <div class="menu__item-divider"></div>
+    //             <div class="menu__item-price">
+    //                 <div class="menu__item-cost">Цена:</div>
+    //                 <div class="menu__item-total"><span>${price}</span> руб/день</div>
+    //             </div>`;
+            
+    //         document.querySelector('.menu .container').append(elem);
+    //     });
+    // }
+
+    // new MenuItem(
+    //     "img/tabs/vegy.jpg",
+    //     "vegy",
+    //     `Меню "Фитнес"`,
+    //     `Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!`,
+    //     29,
+    //     '.menu .container',
+    //     'menu__item'
+    // ).render();
+    // new MenuItem(
+    //     "img/tabs/elite.jpg",
+    //     "elite",
+    //     `Меню “Премиум”`,
+    //     `В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!`,
+    //     50,
+    //     '.menu .container',
+    //     'menu__item'
+    // ).render();
+    // new MenuItem(
+    //     "img/tabs/post.jpg",
+    //     "post",
+    //     `Меню "Постное"`,
+    //     `Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`,
+    //     30,
+    //     '.menu .container',
+    //     'menu__item'
+    // ).render();
 
 
     // Forms POST
@@ -303,10 +329,22 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     forms.forEach(form => {
-        postData(form);
+        bindPostData(form);
     });
 
-    function postData(form) {
+    const postData = async (url, data) => {
+        const result = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-type' : 'application/json'
+            },
+            body: data
+        });
+
+        return await result.json();
+    };
+
+    function bindPostData(form) {
         form.addEventListener('submit', (event)=> {
             event.preventDefault();
 
@@ -319,40 +357,27 @@ document.addEventListener('DOMContentLoaded', () => {
             statusMessage.classList.add('status');
             //form.appendChild(statusMessage);
             form.insertAdjacentElement('afterEnd', statusMessage);
-
-
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-            //Когда используем связку  XMLHttpRequest и FormData то 
-            //заголовок устанавливать не нужно
-            // request.setRequestHeader('Content-type', 'multipart/form-data');
-            request.setRequestHeader('Content-type', 'application/json');
             //отправка formData
             const formData = new FormData(form);
             //для json
-            const object = {};
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-            formData.forEach( (value, key) => {
-                object[key] = value;
+            // formData.forEach( (value, key) => {
+            //     object[key] = value;
+            // });
+            
+            //Fetch
+            postData('http://localhost:3000/requests', json)
+            .then(data => {
+                console.log(data);
+                showThanksModal(message.success);                
+                statusMessage.remove();
+            }).catch(() => {
+                showThanksModal(message.failure)
+            }).finally(() => {
+                clearForm();
             });
 
-            const json = JSON.stringify(object);
-
-            //отправляем форму
-            //request.send(formData);
-            request.send(json);
-
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log(request.response);
-                    showThanksModal(message.success);
-                    clearForm();
-                    statusMessage.remove();
-                } else {
-                    showThanksModal(message.failure)
-                    clearForm();
-                }
-            });
 
             function clearForm() {
                 form.reset();
@@ -393,11 +418,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 3000);
             }
 
-
+           
         });
 
         
     }
+            //get запрос
+            // fetch('https://jsonplaceholder.typicode.com/todos/1')
+            // .then(response => response.json())
+            // .then(json => console.log(json));
+
+            //Post запрос
+            // fetch('https://jsonplaceholder.typicode.com/posts', {
+            //     method : "POST",
+            //     body: JSON.stringify({name: 'Alex'}),
+            //     headers: 
+            //         {
+            //             'Content-type' : 'application/json'
+            //         }
+            // })
+            // .then(response => response.json())
+            // .then(json => console.log(json));
+
+          fetch('http://localhost:3000/menu')
+            .then(data => data.json())
+            .then(res => console.log(res));  
+
+
 
 
 
