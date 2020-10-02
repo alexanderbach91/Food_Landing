@@ -454,10 +454,12 @@ document.addEventListener('DOMContentLoaded', () => {
               totalCounter = document.querySelector('#total'),
               sliderWrapper = document.querySelector('.offer__slider-wrapper'),
               sliderField = document.querySelector('.offer__slider-inner'),
-              width = window.getComputedStyle(sliderWrapper).width;
+              width = window.getComputedStyle(sliderWrapper).width; //ширина,сколько места занимает блок
 
-        
+         //Индекс для определения номера слайдера
+
         let sliderIndex = 1;
+
         // Вариант 1
 
 
@@ -502,8 +504,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // });
         
         //Слайдер вариант 2
+
+        //вспомогательная переменная для определения насколько прокрутили слайды
         let offset = 0;
 
+        //добавляем нули в счетчик
         if (sliders.length < 10) {
              totalCounter.textContent = `0${sliders.length}`;
              currentCounter.textContent = `0${sliderIndex}`;
@@ -511,16 +516,20 @@ document.addEventListener('DOMContentLoaded', () => {
              totalCounter.textContent = sliders.length;
              currentCounter.textContent = sliderIndex;
          }
-
+        //устанавливаем ширину и стили нижней обертки слайдеров
+        //чтобы они поместились  и были в одну строку
         sliderField.style.width = 100 * sliders.length + '%';
         sliderField.style.display = 'flex';
         sliderField.style.transition = '0.5s all';
-
+         
+        //у верхней обертки делаем оверфлоу хидден,чтобы она показывала ровно один слайд
         sliderWrapper.style.overflow = 'hidden';
 
+        //устанавливаем ширину каждого слайдера
         sliders.forEach(slide => {
             slide.style.width = width;
         });
+
 
         slider.style.position = 'relative';
 
@@ -566,22 +575,31 @@ document.addEventListener('DOMContentLoaded', () => {
             indicators.append(dot);
             dots.push(dot);
         }
-
+        //обработчик события на кнопку дальше
         arrowNext.addEventListener('click' , () => {
+            //если отступ будет равен ширина одного слайда, умноженного
+            //на кол-во слайдов, то устанавливаем ofsset в 0, чтобы вернуться обратно
+            //используем slice чтобы отрезать два последних символа и 
+            //и превращаем в число
             if (offset === +width.slice(0, width.length - 2) * (sliders.length - 1)) {
                 offset = 0;
             } else {
+                //добавляем к offset ширину одного слайда
                 offset += +width.slice(0, width.length - 2);
             }
             
+            //сдвиг вправо с помощью translate
             sliderField.style.transform = `translateX(-${offset}px)`;
 
+            //меняем индекс слайда, если дошли до конца то ставим в 1
+            //или же просто прибавляем
             if (sliderIndex == sliders.length) {
                 sliderIndex = 1;
             } else {
                 sliderIndex++;
             }
-
+            //если слайдов меньше чем 10, прибавляем 0,
+            //иначе оставляем
             if(sliders.length < 10) {
                 currentCounter.textContent = `0${sliderIndex}`;
             } else {
@@ -595,14 +613,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         arrowPrev.addEventListener('click' , () => {
+            //тоже самое что и в предыдущем случае,только
+            //если мы дошли до начала и нажимаем еще раз назад,
+            //то перемещаемся в конец
             if (offset === 0) {
                 offset = +width.slice(0, width.length - 2) * (sliders.length - 1);
             } else {
+                //отнимаем от offset ширину одного слайда
                 offset -= +width.slice(0, width.length - 2);
             }
             
             sliderField.style.transform = `translateX(-${offset}px)`;
 
+            
             if (sliderIndex == 1) {
                 sliderIndex = sliders.length ;
             } else {
@@ -641,9 +664,94 @@ document.addEventListener('DOMContentLoaded', () => {
         dots[sliderIndex - 1].style.opacity = 1;
      });
  });
+
+ // Calculator
+
+ const result = document.querySelector('.calculating__result');
+ //нужно значение по умолчанию чтобы рассчитывать результат
+ let sex = 'female', 
+ height, weight, age, 
+ ratio = 1.375;
+
+ //функция для расчета результата
+ function calcTotal() {
+     if (!sex || !height || !weight || !age || !ratio) {
+         result.textContent = 'Не хватает данных';
+         return;
+     }
+
+     if (sex === 'female') {
+         result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
+     } else {
+         result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
+     }
+ }
+//вызываем чтобы не отображался рез-тат по дефолту
+ calcTotal();
+
+ //навешиваем обработчики событий на нужные нам элементы выборки
+ //получаем пол и ратио, записываем их и устанавливаем класс активности
+ function getStaticInformation(parentSelector, activeClass) {
+     //получаем дивы выборки внутри родительского селектора
+    const elements = document.querySelectorAll(`${parentSelector} div`);
+    elements.forEach(elem => {
+        elem.addEventListener('click' , (e) => {
+            //если кликнули в див ратио,то записываем в него значение по аттрибуту data
+            //иначе при клике в пол, записываем id того дива куда кликнули
+            if (e.target.getAttribute('data-ratio')) {
+                ratio = +e.target.getAttribute('data-ratio');
+            } else {
+                sex = e.target.getAttribute('id');
+            }
+    
+            console.log(ratio, sex);
+            
+            //для всех элементов убираем класс активности 
+            // и ставим в класс активности в кликнутый див
+            elements.forEach(elem => {
+                elem.classList.remove(activeClass);
+            });
+        
+            e.target.classList.add(activeClass);
+            calcTotal();
+        });
+    });
+    
+
+   
+ }
+ //вызываем два раза для двух дивов
+ getStaticInformation('#gender', 'calculating__choose-item_active');
+ getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
       
 
+//функция для инпутов
+function getDynamicInfo(inputSelector) {
+    const input = document.querySelector(inputSelector);
 
+    //вещаем обработчик событий на инпут и проверяем с каким 
+    //инпутом работаем
+    input.addEventListener('input' , () => {
+        switch(input.getAttribute('id')) {
+            case 'height' :
+                height = +input.value;
+                break;
+            case 'weight' :
+                weight = +input.value;
+                break;
+            case 'age':
+                age = +input.value;
+                break;
+        }
+
+        calcTotal();
+    });
+    
+}
+
+getDynamicInfo('#height');
+getDynamicInfo('#weight');
+getDynamicInfo('#age');
 
 
 
