@@ -1,14 +1,14 @@
-function slider() {
+function slider({container, slide, nextArrow, prevArrow, total, current, wrapper, field}) {
     //Слайдер 
 
-    const sliders = document.querySelectorAll('.offer__slide'),
-        slider = document.querySelector('.offer__slider'),
-        arrowNext = document.querySelector('.offer__slider-next'),
-        arrowPrev = document.querySelector('.offer__slider-prev'),
-        currentCounter = document.querySelector('#current'),
-        totalCounter = document.querySelector('#total'),
-        sliderWrapper = document.querySelector('.offer__slider-wrapper'),
-        sliderField = document.querySelector('.offer__slider-inner'),
+    const slides = document.querySelectorAll(slide),
+        slider = document.querySelector(container),
+        arrowNext = document.querySelector(nextArrow),
+        arrowPrev = document.querySelector(prevArrow),
+        currentCounter = document.querySelector(current),
+        totalCounter = document.querySelector(total),
+        sliderWrapper = document.querySelector(wrapper),
+        sliderField = document.querySelector(field),
         width = window.getComputedStyle(sliderWrapper).width; //ширина,сколько места занимает блок
 
     //Индекс для определения номера слайдера
@@ -18,26 +18,26 @@ function slider() {
     // Вариант 1
 
 
-    // if (sliders.length < 10) {
-    //     totalCounter.textContent = `0${sliders.length}`;
+    // if (slides.length < 10) {
+    //     totalCounter.textContent = `0${slides.length}`;
     // }
 
     // sliderChange(sliderIndex);
 
     // function sliderChange(id) {
-    //     if (id > sliders.length) {
+    //     if (id > slides.length) {
     //         sliderIndex = 1;
     //     }
 
     //     if (id < 1) {
-    //         sliderIndex = sliders.length;
+    //         sliderIndex = slides.length;
     //     }
-    //     sliders.forEach(item => {
+    //     slides.forEach(item => {
     //         item.classList.remove('show');
     //         item.classList.add('hide');
     //     });
-    //     sliders[sliderIndex- 1].classList.add('show');
-    //     if (sliders.length < 10) {
+    //     slides[sliderIndex- 1].classList.add('show');
+    //     if (slides.length < 10) {
     //         currentCounter.textContent = `0${sliderIndex}`;
     //     } else {
     //         currentCounter.textContent = `${sliderIndex}`;
@@ -64,16 +64,16 @@ function slider() {
     let offset = 0;
 
     //добавляем нули в счетчик
-    if (sliders.length < 10) {
-        totalCounter.textContent = `0${sliders.length}`;
+    if (slides.length < 10) {
+        totalCounter.textContent = `0${slides.length}`;
         currentCounter.textContent = `0${sliderIndex}`;
     } else {
-        totalCounter.textContent = sliders.length;
+        totalCounter.textContent = slides.length;
         currentCounter.textContent = sliderIndex;
     }
     //устанавливаем ширину и стили нижней обертки слайдеров
     //чтобы они поместились  и были в одну строку
-    sliderField.style.width = 100 * sliders.length + '%';
+    sliderField.style.width = 100 * slides.length + '%';
     sliderField.style.display = 'flex';
     sliderField.style.transition = '0.5s all';
 
@@ -81,7 +81,7 @@ function slider() {
     sliderWrapper.style.overflow = 'hidden';
 
     //устанавливаем ширину каждого слайдера
-    sliders.forEach(slide => {
+    slides.forEach(slide => {
         slide.style.width = width;
     });
 
@@ -105,7 +105,7 @@ function slider() {
     `;
     slider.append(indicators);
 
-    for (let i = 0; i < sliders.length; i++) {
+    for (let i = 0; i < slides.length; i++) {
         const dot = document.createElement('li');
         dot.setAttribute('data-slide-to', i + 1);
         dot.style.cssText = `
@@ -136,7 +136,7 @@ function slider() {
         //на кол-во слайдов, то устанавливаем ofsset в 0, чтобы вернуться обратно
         //используем slice чтобы отрезать два последних символа и 
         //и превращаем в число
-        if (offset === +width.slice(0, width.length - 2) * (sliders.length - 1)) {
+        if (offset === +width.slice(0, width.length - 2) * (slides.length - 1)) {
             offset = 0;
         } else {
             //добавляем к offset ширину одного слайда
@@ -148,14 +148,14 @@ function slider() {
 
         //меняем индекс слайда, если дошли до конца то ставим в 1
         //или же просто прибавляем
-        if (sliderIndex == sliders.length) {
+        if (sliderIndex == slides.length) {
             sliderIndex = 1;
         } else {
             sliderIndex++;
         }
         //если слайдов меньше чем 10, прибавляем 0,
         //иначе оставляем
-        if (sliders.length < 10) {
+        if (slides.length < 10) {
             currentCounter.textContent = `0${sliderIndex}`;
         } else {
             currentCounter.textContent = sliderIndex;
@@ -172,7 +172,7 @@ function slider() {
         //если мы дошли до начала и нажимаем еще раз назад,
         //то перемещаемся в конец
         if (offset === 0) {
-            offset = +width.slice(0, width.length - 2) * (sliders.length - 1);
+            offset = +width.slice(0, width.length - 2) * (slides.length - 1);
         } else {
             //отнимаем от offset ширину одного слайда
             offset -= +width.slice(0, width.length - 2);
@@ -182,12 +182,12 @@ function slider() {
 
 
         if (sliderIndex == 1) {
-            sliderIndex = sliders.length;
+            sliderIndex = slides.length;
         } else {
             sliderIndex--;
         }
 
-        if (sliders.length < 10) {
+        if (slides.length < 10) {
             currentCounter.textContent = `0${sliderIndex}`;
         } else {
             currentCounter.textContent = sliderIndex;
@@ -207,7 +207,7 @@ function slider() {
             offset = +width.slice(0, width.length - 2) * (slideTo - 1);
             sliderField.style.transform = `translateX(-${offset}px)`;
 
-            if (sliders.length < 10) {
+            if (slides.length < 10) {
                 currentCounter.textContent = `0${sliderIndex}`;
             } else {
                 currentCounter.textContent = sliderIndex;
@@ -224,4 +224,4 @@ function slider() {
 
 
 
-module.exports = slider;
+export default slider;

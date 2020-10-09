@@ -1,3 +1,6 @@
+import {getItemData} from '../services/services';
+
+
 function cards() {
     class MenuItem {
         constructor(image, alt, header, description, price, parentSelector, ...classes) {
@@ -55,15 +58,7 @@ function cards() {
     }
 
     //Создаем новые элементы и сразу их отрисовываем на страницу
-    const getItemData = async (url) => {
-        const result = await fetch(url);
-
-        if (!result.ok) {
-            throw new Error(`Could not get data from ${url} , status: ${result.status}`);
-        }
-
-        return await result.json();
-    };
+    
 
     getItemData('http://localhost:3000/menu')
         .then(data => {
@@ -133,4 +128,4 @@ function cards() {
 }
 
 
-module.exports = cards;
+export default cards;

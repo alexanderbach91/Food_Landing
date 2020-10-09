@@ -1,8 +1,7 @@
-function timer() {
-    //Работа с таймером
+import cards from "./cards";
 
-    const deadline = '2020-09-12';
-    //const deadline = '2020-09-14';
+function timer(timerSelector, deadline) {
+    //Работа с таймером
 
     function getTimeLeft(endtime) {
         const t = Date.parse(endtime) - Date.parse(new Date()), //получаем разницу с дедлайном в мс
@@ -64,7 +63,7 @@ function timer() {
         }
     }
 
-    setClock('.timer', deadline);
+    setClock(timerSelector, deadline);
 }
 
-module.exports = timer;
+export default timer;
